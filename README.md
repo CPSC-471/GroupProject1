@@ -3,5 +3,7 @@
 Team Members:
 
 Jeffrey Lo
-Mike 
+
+Mike
+
 Joseph Chau
