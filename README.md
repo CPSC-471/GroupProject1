@@ -4,6 +4,6 @@ Team Members:
 
 Jeffrey Lo
 
-Mike
+Mike Souchitto
 
 Joseph Chau
