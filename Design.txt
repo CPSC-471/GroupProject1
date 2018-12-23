@@ -1,0 +1,107 @@
+Designing the Protocol
+
+------ Professor Tian's Questions ------
+
+What kinds of messages will be exchanged across the control channel?
+
+    commands - ls, get, put
+    error messages
+
+    These are given through codes similar to FTP/HTTP status codes.
+    1000 - Get
+    2000 - Put
+    4000 - Input Error
+    etc.
+
+How should the other side respond to the messages?
+
+	ACKs
+
+    Correct information given: user should be able to do what they want.
+
+        ls:             server sends back a list of file names; client
+                        displays the list
+        get filename:   server sends the file to the client
+        push filename:  client sends the file to the server
+
+    Incorrect information given: user should be told what was wrong.
+        - This means user errors should be displayed client-side so
+          the user can read them.
+
+        bad command:    client handles this and displays an error.
+                        if the server gets a bad command, an error is
+                        displayed server side.
+        bad filename:   For the get command, server sends error message
+                        to client; client displays message to user.
+                        For the put command, client displays error
+                        message to user.
+
+What sizes/formats will the messages have?
+
+	Padding messages so they are the same size
+
+    Sizes:      MAX_BYTES - 512
+    Formats:    String;
+                Commands:   Dictionary/list
+                Messages:   0 = Error; 1 = OK
+
+What message exchanges have to take place in order to setup a file transfer channel?
+
+	3 Way Handshake
+
+	- Scenario for get:                                     Connection type:
+	user:   get <filename>                                  -
+	client: send get command & filename to server           Control
+	server: send message (OK/Not OK) to client              Control
+    -- if OK ---
+        server: send file size to client                    Data
+        client: prepare new file with <filename>            -
+        client: prepare to receive <file size> of data      -
+        server: send file to client                         Data
+        client: get & save file                             Data
+        client: display <filename> and <file size> to user  -
+    --- if Not OK ---
+        client: display error message to user               -
+                (Filename does not exist)
+
+	- Scenario for ls:                                      Connection type:
+	    user:   ls                                              -
+	    client: send ls command to server                       Control
+	    server: send size of list of files to client            Data
+	    client: prepare to receive <list size> of data          -
+	    server: send list of files to client                    Data
+	    client: get and display list of files to user           Data
+
+	- Scenario for put:                                     Connection type:
+	    user:   put <filename>                                  -
+	    client: send put command & filename to server           Control
+	    server: send message (OK/Not OK) to client              Control
+	    --- if OK ---
+	        client: send file size to server                    Data
+	        server: prepare a new file with <filename>          -
+	        server: prepare to receive <file size> of data      -
+	        client: send file to server                         Data
+	        server: get & save file                             Data
+	    --- if Not OK ---
+	        client: display error message to user.              -
+	                (Filename existing -> should overwrite)
+
+	- Scenario for quit:                                    Connection type:
+	    user:   quit                                            -
+	    client: display's exit message                          -
+	    client: closes connection                               Control
+
+How will the receiving side know when to start/stop receiving the file?
+
+	Header information
+
+    An while loop that listen for connections. After accepting connection, server will listen for commands from client. These commands are a status command, for example 1000 is a get request. Upon completion, be it successful or error, a status code will be returned to the client. Server will continue to wait for next command until connection is terminated.
+
+How to avoid overflowing TCP buffers?
+
+	Check the current packet size against buffer size
+
+How to Start Python Files:
+  python3.7 ServerSide.py 1234
+
+  python3.7 ClientSide.py localhost 1234
