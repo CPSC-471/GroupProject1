@@ -9,7 +9,7 @@ What kinds of messages will be exchanged across the control channel?
 
 How should the other side respond to the messages?
 
-ACKs
+	ACKs
 
     Correct information given: user should be able to do what they want.
 
@@ -44,9 +44,9 @@ What message exchanges have to take place in order to setup a file transfer chan
 	3 Way Handshake
 
 	- Scenario for get:                                     Connection type:
-    user:   get <filename>                                  -
-    client: send get command & filename to server           Control
-    server: send message (OK/Not OK) to client              Control
+	user:   get <filename>                                  -
+	client: send get command & filename to server           Control
+	server: send message (OK/Not OK) to client              Control
     -- if OK ---
         server: send file size to client                    Data
         client: prepare new file with <filename>            -
