@@ -24,14 +24,14 @@
   ```
   > Python3.7 ServerSide.py <port>
 
-  //For Example: Python3.7 ServerSide.py <1234>
+  //For Example: Python3.7 ServerSide.py 1234
   ```
 
   * Client Setup
   ```
   > Python3.7 ClientSide.py <ip> <port>
 
-  // For Example: Python3.7 ClientSide.py <localhost> <1234>
+  // For Example: Python3.7 ClientSide.py localhost 1234
 
   ```
 
