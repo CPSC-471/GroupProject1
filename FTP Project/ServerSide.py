@@ -28,11 +28,12 @@ connectProcess = set()
 
 
 def usage():
-    abort(usage.message)
-usage.message = """Usage:
-    server.py <PORT_NUM>
-    server.py <IP> <PORT_NUM>
-"""
+    usage.message = """Usage:
+        server.py <PORT_NUM>
+        server.py <IP> <PORT_NUM>
+    """
+    quit(usage.message)
+
 
 # Send data (bytes) across socketData to data_ip:data_port
 def send_data(data_ip, data_port, data):
@@ -43,7 +44,7 @@ def send_data(data_ip, data_port, data):
     socketData.connect((data_ip, data_port))
     pMsg("**** Success!")
     # Send 510 with data length
-    send_msg(socketClient, MSG_510 % (len(data)))
+    send_msg(socketClient, CODE_510 % (len(data)))
     # Send data
     socketData.sendall(data)
     socketData.close()
@@ -71,7 +72,7 @@ def check_file(filename):
 def put(params, data_ip):
     global socketData
     if len(params) < 5:
-        send_msg(socketClient, MSG_800)
+        send_msg(socketClient, CODE_800)
         return False
     data_port = int(params[2])
     length = int(params[3])
@@ -83,14 +84,14 @@ def put(params, data_ip):
     pMsg("*put:  Success!")
     if not check_path(path):
         # Don't write it!  It's not under PWD
-        send_msg(socketClient, MSG_290 %(path))
+        send_msg(socketClient, CODE_290 %(path))
         socketData.close()
         return False
     # Open the file
     try:
         fd = open(path, "wb")
         # Send 510 with data length
-        send_msg(socketClient, MSG_510 % (-1))
+        send_msg(socketClient, CODE_510 % (-1))
         bytesrecv = 0
         while bytesrecv < length:
             length_block = min(length - bytesrecv, 4096)
@@ -98,7 +99,7 @@ def put(params, data_ip):
             block = recv_block(socketData, length_block)
             if block is None:
                 # Client hung up
-                send_msg(socketClient, MSG_590)
+                send_msg(socketClient, CODE_590)
                 socketData.close()
                 return False
             fd.write(block)
@@ -106,11 +107,11 @@ def put(params, data_ip):
         fd.close()
     except(OSError):
         # Permission problems
-        send_msg(socketClient, MSG_290)
+        send_msg(socketClient, CODE_290)
         socketData.close()
         return False
     # Send a 520 Success
-    send_msg(socketClient, MSG_520)
+    send_msg(socketClient, CODE_520)
     socketData.close()
     return True
 
@@ -119,7 +120,7 @@ def put(params, data_ip):
 # data_ip is the IP address of the client's data connection
 def ls(params, data_ip):
     if len(params) < 4:
-        send_msg(socketClient, MSG_800)
+        send_msg(socketClient, CODE_800)
         return False
     data_port = int(params[2])
     path = params[3]
@@ -133,19 +134,19 @@ def ls(params, data_ip):
                 stdout=subprocess.PIPE).stdout.read()
         send_data(data_ip, data_port, ls_data)
         # Send a 520 Success
-        send_msg(socketClient, MSG_520)
+        send_msg(socketClient, CODE_520)
         return True
     else:
         # Don't list the path.  It's not under PWD
         send_data(data_ip, data_port, "Permission denied!\n".encode())
-        send_msg(socketClient, MSG_390 %(path))
+        send_msg(socketClient, CODE_390 %(path))
         return False
 
 # GET command
 def get(params, data_ip):
     global socketData
     if len(params) < 4:
-        send_msg(socketClient, MSG_800)
+        send_msg(socketClient, CODE_800)
         return False
     data_port = int(params[2])
     filename = params[3]
@@ -161,7 +162,7 @@ def get(params, data_ip):
         socketData.connect((data_ip, data_port))
         pMsg("SendingData: Success!")
         # Send 510 with data length
-        send_msg(socketClient, MSG_510 % filesize)
+        send_msg(socketClient, CODE_510 % filesize)
         bytes_sent = 0
         while (bytes_sent < filesize):
             # Send data
@@ -169,19 +170,19 @@ def get(params, data_ip):
             bytes_sent += len(bytes_read)
             bytes_read = fo.read(512)
         # Send a 520 Success
-        send_msg(socketClient, MSG_520)
+        send_msg(socketClient, CODE_520)
         socketData.close()
         return True
     else:
         pMsg("*get:  Not a file, or you're not allowed to look in this path")
         send_data(data_ip, data_port, "".encode())
-        send_msg(socketClient, MSG_190 %(filename))
+        send_msg(socketClient, CODE_190 %(filename))
         return False
 
 def handle_session(addr):
     pMsg("*SessionHandler:  Handling connection from %s:%d" %(addr[0], addr[1]))
     while True:
-        message = recv_msg(socketClient)
+        message = receive_msg(socketClient)
         if message is None or len(message) < 1:
             # Gracefully terminate
             socketClient.close()
@@ -204,7 +205,7 @@ def handle_session(addr):
             get(message, addr[0])
         else:
             # Send the 800 response (What you say!!)
-            send_msg(socketClient, MSG_800)
+            send_msg(socketClient, CODE_800)
 
 def main():
     global socketWelcome, socketClient, serverIP, serverPort, isProcess, connectProcess
@@ -265,6 +266,7 @@ def handle_kill(sig, frame):
     # This will actually raise an exception, which throws control
     # back to shutdown (see the end of the file).
     sys.exit(0)
+
 def reap_children(sig, frame):
     while True:
         try:
@@ -276,6 +278,7 @@ def reap_children(sig, frame):
             pMsg("**** clearing PID %d" %(pid))
         except(ChildProcessError):
             break;
+
 signal.signal(signal.SIGTERM, handle_kill)
 signal.signal(signal.SIGQUIT, handle_kill)
 signal.signal(signal.SIGHUP, handle_kill)

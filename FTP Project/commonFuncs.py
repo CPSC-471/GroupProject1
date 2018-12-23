@@ -19,6 +19,7 @@ CODE_300 = "300 LS %d %s\r\n"
 CODE_390 = "390 Cannot list %s\r\n"
 CODE_510 = "510 %d Transfer started\r\n"
 CODE_520 = "520 Transfer success\r\n"
+CODE_590 = "590 Transfer failed"
 CODE_800 = "800 Command Error\r\n"
 CODE_900 = "900 Goodbye - Closing\r\n"
 
@@ -99,14 +100,14 @@ def split_msg(msg):
 
 # Send and Print the message on the socket
 def send_msg(socket, msg):
-    pMsg("[send_msg] \"%s\"" %(msg.strip()))
+    #pMsg("**send_msg \"%s\"" %(msg.strip()))
     socket.sendall(msg.encode())
 
 # receives and prints message on the socket
 def receive_msg(sock):
     raw_message = read_ret(sock)
     if raw_message is None:
-        pMsg("**receive_msg: received None - connection closed")
+        #pMsg("**receive_msg: received None - connection closed")
         return None
-    pMsg("**receive_msg: \"%s\"" %(raw_message.strip()))
+    #pMsg("**receive_msg: \"%s\"" %(raw_message.strip()))
     return split_msg(raw_message)
