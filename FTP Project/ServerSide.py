@@ -180,7 +180,6 @@ def handle_session(addr):
     while True:
         message = receive_msg(socketClient)
         if message is None or len(message) < 1:
-            # Gracefully terminate
             socketClient.close()
             break
         elif message[0] == "2000":
@@ -200,7 +199,7 @@ def handle_session(addr):
             # GET
             get(message, addr[0])
         else:
-            send_msg(socketClient, CODE_800)
+            send_msg(socketClient, CODE_4000)
 
 def main():
     global socketWelcome, socketClient, serverIP, serverPort, isProcess, connectProcess
@@ -236,7 +235,7 @@ def main():
         else:
             # Parent
             connectProcess.add(pid_child)
-            pMsg("**** Forking child PID %d" %(pid_child))
+            #pMsg("**** Forking child PID %d" %(pid_child))
 
 # Clean things up before terminating
 def shutdown(kill_children=False):
@@ -247,7 +246,6 @@ def shutdown(kill_children=False):
     else:
         if(kill_children):
             pMsg("**** Killing child processes")
-            # Turn off child reaping b/c we do it here.
             signal.signal(signal.SIGCHLD, signal.SIG_DFL)
             for pid in connectProcess:
                 pMsg("**** Sending SIGTERM to %d" %(pid))
@@ -270,7 +268,7 @@ def reap_children(sig, frame):
             if pid <= 0:
                 break;
             connectProcess.discard(pid)
-            pMsg("**** clearing PID %d" %(pid))
+            #pMsg("**** clearing PID %d" %(pid))
         except(ChildProcessError):
             break;
 

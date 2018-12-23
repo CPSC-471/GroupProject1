@@ -7,6 +7,12 @@ What kinds of messages will be exchanged across the control channel?
     commands - ls, get, put
     error messages
 
+    These are given through codes similar to FTP/HTTP status codes.
+    1000 - Get
+    2000 - Put
+    4000 - Input Error
+    etc.
+
 How should the other side respond to the messages?
 
 	ACKs
@@ -34,7 +40,7 @@ What sizes/formats will the messages have?
 
 	Padding messages so they are the same size
 
-    Sizes:      100B
+    Sizes:      MAX_BYTES - 512
     Formats:    String;
                 Commands:   Dictionary/list
                 Messages:   0 = Error; 1 = OK
@@ -78,22 +84,24 @@ What message exchanges have to take place in order to setup a file transfer chan
 	        server: get & save file                             Data
 	    --- if Not OK ---
 	        client: display error message to user.              -
-	                (Filename exists -- or do we want to allow overwrites?)
+	                (Filename existing -> should overwrite)
 
 	- Scenario for quit:                                    Connection type:
 	    user:   quit                                            -
 	    client: display's exit message                          -
-	    client: closes connection                               -
+	    client: closes connection                               Control
 
 How will the receiving side know when to start/stop receiving the file?
 
 	Header information
 
-    Probably a (while) loop that will check the total file size against
-    the amount received. In order to enter the loop, the file size should
-    be greater than the amount received. Once the loop is exited, the
-    receiving side will know to stop receiving the file.
+    An while loop that listen for connections. After accepting connection, server will listen for commands from client. These commands are a status command, for example 1000 is a get request. Upon completion, be it successful or error, a status code will be returned to the client. Server will continue to wait for next command until connection is terminated.
 
 How to avoid overflowing TCP buffers?
 
 	Check the current packet size against buffer size
+
+How to Start Python Files:
+  python3.7 ServerSide.py 1234
+
+  python3.7 ClientSide.py localhost 1234
