@@ -11,17 +11,17 @@ import os
 # C O N S T A N T S
 
 # Custom Protocol msgs
-CODE_100 = "100 GET %d %s\r\n"
-CODE_190 = "190 Cannot send %s\r\n"
-CODE_200 = "200 PUT %d %d %s\r\n"
-CODE_290 = "290 Cannot write %s\r\n"
-CODE_300 = "300 LS %d %s\r\n"
-CODE_390 = "390 Cannot list %s\r\n"
-CODE_510 = "510 %d Transfer started\r\n"
-CODE_520 = "520 Transfer success\r\n"
-CODE_590 = "590 Transfer failed"
-CODE_800 = "800 Command Error\r\n"
-CODE_900 = "900 Goodbye - Closing\r\n"
+CODE_1000 = "1000 GET %d %s\r\n"
+CODE_1090 = "1090 Cannot send %s\r\n"
+CODE_2000 = "2000 PUT %d %d %s\r\n"
+CODE_2090 = "2090 Cannot write %s\r\n"
+CODE_3000 = "3000 LS %d %s\r\n"
+CODE_3090 = "3090 Cannot list %s\r\n"
+CODE_5010 = "5010 %d Transfer started\r\n"
+CODE_5020 = "5020 Transfer success\r\n"
+CODE_5090 = "5090 Transfer failed"
+CODE_4000 = "4000 Command Error\r\n"
+CODE_9000 = "9000 Goodbye - Closing\r\n"
 
 # F U N C T I O N
 def quit(msg, end='\n'):
@@ -82,13 +82,13 @@ def split_msg(msg):
     basic_split = match.groups()
     code = basic_split[0]
     # Add logic for more commands here
-    if code == "100":
+    if code == "1000":
         match = re.search(r'^\s*(\w+)\s+(\d+)\s+(.+)\s*$', basic_split[1])
-    elif code == "200":
+    elif code == "2000":
         match = re.search(r'^\s*(\w+)\s+(\d+)\s+(\d+)\s+(.+)\s*$', basic_split[1])
-    elif code == "300":
+    elif code == "3000":
         match = re.search(r'^\s*(\w+)\s+(\d+)(?:\s+(.+))?\s*$', basic_split[1])
-    elif code == "510":
+    elif code == "5010":
         match = re.search(r'^\s*([0-9\-]+)\s+(.+)\s*$', basic_split[1])
     else:
         return basic_split
