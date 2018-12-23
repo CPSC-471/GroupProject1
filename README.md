@@ -37,20 +37,28 @@
 
 ## Client Commands:
    * #### get
+     * Get file on server from designated server path
    ```
    JMJftp> get <path>
 
    //For example: get exampleDir/sampleFile1.txt
    ```
    * #### put
+     * Put file on server from designated client path
    ```
    JMJftp> put <path>
 
    //For example: get exampleDir/sampleFile1.txt
    ```
    * #### ls
+     * see files on server
    ```
    JMJftp> ls <path - optional>
+   ```
+   * #### help
+     * displays list of commands for user
+   ```
+   JMJftp> help
    ```
    * #### quit
    ```
